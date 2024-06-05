@@ -1,0 +1,62 @@
+import pandas as pd
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
+
+# Step 1: Define user-movie rating data with names
+data = {
+    'user_name': ['Aastha', 'Aastha', 'Aastha', 'Keshav', 'Keshav', 'Garu', 'Garu', 'Garu', 'Garu'],
+    'movie_name': ['Conjuring', 'Titanic', 'Avatar', 'Conjuring', 'Avatar', 'Titanic', 'Avatar', 'Avengers', 'Joker'],
+    'rating': [5, 4, 3, 4, 5, 2, 3, 5, 4]
+}
+
+# Create a DataFrame from the data
+df_ratings = pd.DataFrame(data)
+
+# Step 2: Transform the data into a user-item matrix
+user_item_matrix = df_ratings.pivot_table(index='user_name', columns='movie_name', values='rating').fillna(0)
+print("User-Item Matrix:\n", user_item_matrix)
+
+# Step 3: Calculate user similarity using cosine similarity
+user_similarity_matrix = cosine_similarity(user_item_matrix)
+user_similarity_df = pd.DataFrame(user_similarity_matrix, index=user_item_matrix.index, columns=user_item_matrix.index)
+print("\nUser Similarity Matrix:\n", user_similarity_df)
+
+def recommend_items(user, num_recommendations=2):
+    # Step 4: Identify similar users
+    similar_users = user_similarity_df[user].sort_values(ascending=False).index[1:]
+    
+    # Step 5: Aggregate ratings from similar users
+    aggregated_ratings = user_item_matrix.loc[similar_users].mean(axis=0)
+    
+    # Step 6: Filter out already rated items
+    user_ratings = user_item_matrix.loc[user]
+    recommendations = aggregated_ratings[user_ratings == 0]
+    
+    # Step 7: Return top N recommendations
+    return recommendations.sort_values(ascending=False).head(num_recommendations)
+
+# Get and display recommendations for a specific user
+target_user_name = 'Aastha'
+recommended_movies = recommend_items(target_user_name)
+print(f"\nTop Recommendations for {target_user_name}:\n{recommended_movies}")
+
+# Function to execute the recommendation system
+def execute_recommender():
+    print("Welcome to the Movie Recommender System!\n")
+    while True:
+        try:
+            user_name_input = input("Enter User Name (Aastha, Keshav, Garu) to get recommendations or type 'exit' to quit: ")
+            if user_name_input.lower() == 'exit':
+                print("Exiting the Recommender System. Goodbye!")
+                break
+            elif user_name_input in user_item_matrix.index:
+                print(f"\nFetching recommendations for {user_name_input}...")
+                recommendations = recommend_items(user_name_input)
+                print(f"\nRecommendations for {user_name_input}:\n{recommendations}")
+            else:
+                print("Invalid User Name. Please try again.")
+        except ValueError:
+            print("Invalid input. Please enter a valid User Name.")
+
+# Run the recommendation system
+execute_recommender()
