@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 
-# Step 1: Define user-movie rating data with names
+# Step 1:  Define user-movie rating data with names
 data = {
     'user_name': ['Aastha', 'Aastha', 'Aastha', 'Keshav', 'Keshav', 'Garu', 'Garu', 'Garu', 'Garu'],
     'movie_name': ['Conjuring', 'Titanic', 'Avatar', 'Conjuring', 'Avatar', 'Titanic', 'Avatar', 'Avengers', 'Joker'],
