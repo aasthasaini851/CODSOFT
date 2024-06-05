@@ -23,7 +23,12 @@ def check_all_messages(message):
     response('I love you too!', ['i', 'love', 'you'], required_words=['love', 'you'])
     response('Nothing', ['what', 'are', 'you', 'doing'], required_words=['what', 'doing'])
 
-    return max(highest_prob_list, key=highest_prob_list.get)
+    best_match = max(highest_prob_list, key=highest_prob_list.get)
+
+    if highest_prob_list[best_match] == 0:
+        return "I'm not sure how to respond to that."
+
+    return best_match
 
 def get_response(user_input):
     split_message = re.split(r'\s+|[,;?!.-]\s*', user_input.lower())
@@ -32,4 +37,3 @@ def get_response(user_input):
 # Testing the response system
 while True:
     print('Bot: ' + get_response(input('You: ')))
-
